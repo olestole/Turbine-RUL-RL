@@ -8,6 +8,7 @@ class RULEnvironment(Env):
         self.dataframe = dataframe
         self.episode_nr = 0
         self.dt_in = dt_in
+        self.max_episodes = dataframe['machine'].max()
 
         # Two actions: stopp or continue
         # Actions: 1=stop, 0 = continue
@@ -25,27 +26,29 @@ class RULEnvironment(Env):
         self.RUL = self.episode.loc[self.episode['cycle'] == self.index]['rul'].item() # acctual remaining useful life.
 
     def step(self, action):
-        self.RUL += action - 1
         done = False
 
         if action == 1:
             # Action is stop
             done = True
-        
-        if self.RUL <= 0 and action == 0:
+        if self.RUL == 0 and action == 0:
             reward = -1000 # Denne må bestemmes i forhold til hva som er max RUL, og hva han skrev i oppg
             done = True
+
         else:
             reward = 1 # Burde man få høyere reward om man stopper akkurat på null?
             self.index += 1
             self.state = self.episode[self.dt_in].loc[self.episode['cycle'] == self.index]
-        
+
+        self.RUL += action - 1
         info = {} # Placeholder not sure why
 
         return self.state, reward, done, info
+
     def render(self):
         # For printing states etc
-        pass
+        print('e:', self.episode_nr, 'i', self.index)
+        # print(self.episode.loc[self.episode['cycle'] == self.index]['rul'].item())
     
     def reset(self):
         self._set_variables()
