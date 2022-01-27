@@ -22,7 +22,7 @@ class RULEnvironment(Env):
         self.episode = self.dataframe.loc[self.dataframe['machine'] == self.episode_nr]
         self.index = 1
         self.state = self.episode[self.dt_in].loc[self.episode['cycle'] == self.index]
-        self.RUL = int(self.episode.loc[self.episode['cycle'] == self.index]['rul']) # acctual remaining useful life.
+        self.RUL = self.episode.loc[self.episode['cycle'] == self.index]['rul'].item() # acctual remaining useful life.
 
     def step(self, action):
         self.RUL += action - 1
