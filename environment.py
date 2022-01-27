@@ -13,7 +13,7 @@ class RULEnvironment(Env):
         # Actions: 1=stop, 0 = continue
         self.action_space = Discrete(2)
         self.observation_space = Box(np.array(dataframe[dt_in].min()), np.array(dataframe[dt_in].max()))
-        # self._set_variables()
+        self._set_variables()
 
 
     def _set_variables(self):
@@ -49,4 +49,5 @@ class RULEnvironment(Env):
     
     def reset(self):
         self._set_variables()
+        return self.state
 
