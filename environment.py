@@ -13,34 +13,39 @@ class RULEnvironment(Env):
         # Two actions: stopp or continue
         # Actions: 1=stop, 0 = continue
         self.action_space = Discrete(2)
-        self.observation_space = Box(np.array(dataframe[dt_in].min()), np.array(dataframe[dt_in].max()))
+        self.observation_space = Box(np.full((24,), -4), np.full((24,), 4))
         self._set_variables()
 
 
     def _set_variables(self):
+        # If we want to run the episodes over again:
+        '''if self.episode_nr == self.max_episodes:
+            self.episode_nr = 0'''
         # Dataframe contains machines from 1-709
         self.episode_nr += 1
         self.episode = self.dataframe.loc[self.dataframe['machine'] == self.episode_nr]
         self.index = 1
-        self.state = self.episode[self.dt_in].loc[self.episode['cycle'] == self.index]
+        self.state = np.array(self.episode[self.dt_in].loc[self.episode['cycle'] == self.index]).flatten()
         self.RUL = self.episode.loc[self.episode['cycle'] == self.index]['rul'].item() # acctual remaining useful life.
+
+        self.render()
 
     def step(self, action):
         done = False
+        self.RUL += action - 1
 
         if action == 1:
             # Action is stop
             done = True
-        if self.RUL == 0 and action == 0:
+        if self.RUL <= 0 and action == 0:
             reward = -1000 # Denne må bestemmes i forhold til hva som er max RUL, og hva han skrev i oppg
             done = True
 
         else:
             reward = 1 # Burde man få høyere reward om man stopper akkurat på null?
             self.index += 1
-            self.state = self.episode[self.dt_in].loc[self.episode['cycle'] == self.index]
+            self.state = np.array(self.episode[self.dt_in].loc[self.episode['cycle'] == self.index]).flatten()
 
-        self.RUL += action - 1
         info = {} # Placeholder not sure why
 
         return self.state, reward, done, info
