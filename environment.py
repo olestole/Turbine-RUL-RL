@@ -19,8 +19,8 @@ class RULEnvironment(Env):
 
     def _set_variables(self):
         # If we want to run the episodes over again:
-        '''if self.episode_nr == self.max_episodes:
-            self.episode_nr = 0'''
+        if self.episode_nr == self.max_episodes-1:
+            self.episode_nr = 0
         # Dataframe contains machines from 1-709
         self.episode_nr += 1
         self.episode = self.dataframe.loc[self.dataframe['machine'] == self.episode_nr]
