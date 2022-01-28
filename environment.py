@@ -13,8 +13,8 @@ class RULEnvironment(Env):
         # Two actions: stopp or continue
         # Actions: 1=stop, 0 = continue
         self.action_space = Discrete(2)
-        self.observation_space = Box(np.full((24,), -4), np.full((24,), 4))
-        self._set_variables()
+        self.observation_space = Box(np.full((24,), -4.0), np.full((24,), 4.0))
+        # self._set_variables()
 
 
     def _set_variables(self):

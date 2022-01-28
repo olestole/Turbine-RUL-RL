@@ -19,9 +19,12 @@ from tensorflow.keras import backend as k
 # Configuration
 figsize = (9, 3)
 
-def load_data(data_folder):
+def load_data(data_folder, test=False):
     # Read the CSV files
-    fnames = ['train_FD001', 'train_FD002', 'train_FD003', 'train_FD004']
+    if test:
+        fnames = ['test_FD001', 'test_FD002', 'test_FD003', 'test_FD004']
+    else:
+        fnames = ['train_FD001', 'train_FD002', 'train_FD003', 'train_FD004']
     cols = ['machine', 'cycle', 'p1', 'p2', 'p3'] + [f's{i}' for i in range(1, 22)]
     datalist = []
     nmcn = 0

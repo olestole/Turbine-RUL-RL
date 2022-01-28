@@ -91,8 +91,8 @@ class MyAgent(DQNAgent):
         did_abort = False
         try:
             print("My methode is startn")
-            while (self.step < nb_steps and episode<=nb_episodes):
-                if episode>=nb_episodes:
+            while (self.step < nb_steps and episode < nb_episodes):
+                if episode >= nb_episodes:
                     print('IT SHOULD HAVE STOPPED')
                     break
                 if observation is None:  # start of a new episode
