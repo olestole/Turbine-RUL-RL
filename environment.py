@@ -16,6 +16,8 @@ class RULEnvironment(Env):
         self.observation_space = Box(np.full((24,), -4.0), np.full((24,), 4.0))
         # self._set_variables()
 
+        self.penalty = dataframe['rul'].max() * -1
+
 
     def _set_variables(self):
         # If we want to run the episodes over again:
@@ -38,7 +40,7 @@ class RULEnvironment(Env):
             # Action is stop
             done = True
         if self.RUL <= 0 and action == 0:
-            reward = -1000 # Denne må bestemmes i forhold til hva som er max RUL, og hva han skrev i oppg
+            reward = self.penalty # Denne må bestemmes i forhold til hva som er max RUL, og hva han skrev i oppg
             done = True
 
         else:
