@@ -14,5 +14,9 @@ $ python -m venv venv
 # Install the project's dependencies with pip
 $ pip install -r requirements.txt
 ```
+## To run the tensorboard plots run this in the terminal
+```bash
+$ tensorboard --logdir ./tensorboard/
 
+```
 
