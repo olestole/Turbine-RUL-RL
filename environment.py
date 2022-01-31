@@ -13,7 +13,7 @@ class RULEnvironment(Env):
         # Two actions: stopp or continue
         # Actions: 1=stop, 0 = continue
         self.action_space = Discrete(2)
-        self.observation_space = Box(np.full((24,), -4.0), np.full((24,), 4.0))
+        self.observation_space = Box(np.full((24), -4.0), np.full((24), 4.0))
         # self._set_variables()
 
         self.penalty = dataframe['rul'].max() * -1
@@ -30,7 +30,6 @@ class RULEnvironment(Env):
         self.state = np.array(self.episode[self.dt_in].loc[self.episode['cycle'] == self.index]).flatten()
         self.RUL = self.episode.loc[self.episode['cycle'] == self.index]['rul'].item() # acctual remaining useful life.
 
-        self.render()
 
     def step(self, action):
         done = False
@@ -48,7 +47,7 @@ class RULEnvironment(Env):
             self.index += 1
             self.state = np.array(self.episode[self.dt_in].loc[self.episode['cycle'] == self.index]).flatten()
 
-        info = {} # Placeholder not sure why
+        info = {"reward": reward} # Placeholder not sure why
 
         return self.state, reward, done, info
 
