@@ -278,3 +278,18 @@ def plot_crash_points_max_rul(df):
     plt.hlines(avg_maxrul, 0, max_rul_crash_points.index.max(), color='orange', linestyles='dashed')
     plt.title(f"Max RUL of the crashing machines\nAverage max RUL: {round(avg_maxrul.values[0], 2)}")
     plt.show()
+
+def plot_average_reward(df, stop=100):
+    df['reward_estimate'] = round(df['reward'] / df['max_RUL'], 2)
+    df.loc[df['reward_estimate'] < 0, 'reward_estimate'] = 0
+    average_reward_estimate = df['reward_estimate'].mean()
+    df["slack"] = (df["max_RUL"] - df["num_actions"])
+    
+    crash_points = get_crash_points(df)
+
+    plt.title(f"Average reward estimate: {round(average_reward_estimate, 2)}")
+    plt.plot(df['reward_estimate'][:stop])
+    plt.hlines(average_reward_estimate, 0, stop, color='orange', linestyles='dashed')
+    plt.plot(crash_points['slack'][crash_points['slack'].index < stop], '.', color='red')
+    plt.legend(['Reward estimate', 'Average reward estimate', 'Crashed machine'])
+    plt.show()
