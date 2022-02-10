@@ -16,7 +16,8 @@ class RULEnvironment(Env):
         self.observation_space = Box(np.full((24), -4.0), np.full((24), 4.0))
         # self._set_variables()
 
-        self.penalty = dataframe['rul'].max() * -1
+        self.penalty = round(dataframe['rul'].max() * -1.5)
+        # self.penalty = dataframe['rul'].max() * -1
 
 
     def _set_variables(self):
@@ -38,6 +39,8 @@ class RULEnvironment(Env):
         if action == 1:
             # Action is stop
             reward = 1
+            if 0 < self.RUL < 20:
+                reward = 100
             done = True
         elif self.RUL <= 0 and action == 0:
             reward = self.penalty # Denne må bestemmes i forhold til hva som er max RUL, og hva han skrev i oppg
