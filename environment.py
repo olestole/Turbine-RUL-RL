@@ -38,10 +38,9 @@ class RULEnvironment(Env):
         if action == 1:
             # Action is stop
             done = True
-        if self.RUL <= 0 and action == 0:
+        elif self.RUL <= 0 and action == 0:
             reward = self.penalty # Denne må bestemmes i forhold til hva som er max RUL, og hva han skrev i oppg
             done = True
-
         else:
             reward = 1 # Burde man få høyere reward om man stopper akkurat på null?
             self.index += 1
