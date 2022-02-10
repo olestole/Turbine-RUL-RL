@@ -4,7 +4,7 @@ import numpy as np
 import random
 
 class RULEnvironment(Env):
-    def __init__(self, dataframe, dt_in):
+    def __init__(self, dataframe, dt_in, sweet_spot=0.3, bad_spot=0.3):
         self.dataframe = dataframe
         self.episode_nr = 0
         self.dt_in = dt_in
@@ -17,6 +17,10 @@ class RULEnvironment(Env):
         # self._set_variables()
 
         self.penalty = dataframe['rul'].max() * -1
+        # Sweetspot tells us that the last percentage is nice
+        self.sweet_spot = sweet_spot
+        # Badspot tells us that the first percentage is bad
+        self.bad_spot = bad_spot
         
 
 
@@ -38,15 +42,16 @@ class RULEnvironment(Env):
 
         if action == 1:
             # Action is stop
-            reward = 1
+            if self.RUL < round(self.sweet_spot*self.max_RUL):
+                reward = 200
+            elif self.RUL > self.max_RUL - round(self.bad_spot*self.max_RUL):
+                reward = -200
+            else:
+                reward = 1
             done = True
         elif self.RUL <= 0 and action == 0:
             reward = self.penalty # Denne må bestemmes i forhold til hva som er max RUL, og hva han skrev i oppg
             done = True
-        elif 0 < self.RUL < round(0.67*self.max_RUL):
-            reward = 1+self.index/self.max_RUL
-            self.index += 1
-            self.state = np.array(self.episode[self.dt_in].loc[self.episode['cycle'] == self.index]).flatten()
         else:
             reward = 1 # Burde man få høyere reward om man stopper akkurat på null?
             self.index += 1
