@@ -293,3 +293,15 @@ def plot_average_reward(df, stop=100):
     plt.plot(crash_points['slack'][crash_points['slack'].index < stop], '.', color='red')
     plt.legend(['Reward estimate', 'Average reward estimate', 'Crashed machine'])
     plt.show()
+
+def environment_results(df):
+    """
+    Args:
+        df ([DataFrame]): Must include reward_estimate
+    """
+    crash_points = get_crash_points(df)
+
+    percent_of_crashed_machines = round(len(crash_points['slack'])/df['machine'].max(), 4)
+    print('percent_of_crashed_machines:', percent_of_crashed_machines)
+    stop_within_sweetspot = round(len(df[(df['slack'] < 20) & (df['reward_estimate'] > 0)])/df['machine'].max(), 4)
+    print('stop_within_sweetspot:', stop_within_sweetspot)
