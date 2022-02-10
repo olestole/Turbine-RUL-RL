@@ -228,14 +228,16 @@ def create_results_dataframe(machine_max_rul, all_episode_rewards, all_nr_of_act
     }
 
     df = pd.DataFrame(data=d, index=None)
+
+    df["slack"] = (df["max_RUL"] - df["num_actions"])
+    df['reward_estimate'] = round(df['reward'] / df['max_RUL'], 2)
+    
     return df
 
 def get_crash_points(df):
     return df[(df['max_RUL'] == df["num_actions"]) & (df['reward'] < 0)]
 
 def plot_slack(df, stop = 100, normalized = True):
-    
-    df["slack"] = (df["max_RUL"] - df["num_actions"])
     average_slack = df['slack'].mean()
     
     crash_points = get_crash_points(df)
@@ -280,7 +282,6 @@ def plot_crash_points_max_rul(df):
     plt.show()
 
 def plot_average_reward(df, stop=100):
-    df['reward_estimate'] = round(df['reward'] / df['max_RUL'], 2)
     df.loc[df['reward_estimate'] < 0, 'reward_estimate'] = 0
     average_reward_estimate = df['reward_estimate'].mean()
     df["slack"] = (df["max_RUL"] - df["num_actions"])
@@ -295,10 +296,6 @@ def plot_average_reward(df, stop=100):
     plt.show()
 
 def environment_results(df):
-    """
-    Args:
-        df ([DataFrame]): Must include reward_estimate
-    """
     crash_points = get_crash_points(df)
 
     percent_of_crashed_machines = round(len(crash_points['slack'])/df['machine'].max(), 4)
