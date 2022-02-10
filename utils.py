@@ -180,3 +180,36 @@ def load_model(path, env=None):
     # If the model is supposed to be trained on, env need to be set. If it's only going to be used for prediction, it can be None
     model = DQN.load(path, env=env)
     return model
+
+def evaluate(model, environment, num_episodes=100):
+    """
+    Evaluate a RL agent
+    :param model: (BaseRLModel object) the RL Agent
+    :param num_episodes: (int) number of episodes to evaluate it
+    :return: (float) Mean reward for the last num_episodes
+    """
+    # This function will only work for a single Environment
+    env = environment
+    all_episode_rewards = []
+    all_nr_of_actions = []
+    for i in range(num_episodes):
+        episode_rewards = []
+        nr_of_actions = 0
+        done = False
+        obs = env.reset()
+        while not done:
+            # _states are only useful when using LSTM policies
+            action, _states = model.predict(obs)
+            # here, action, rewards and dones are arrays
+            # because we are using vectorized env
+            obs, reward, done, info = env.step(action)
+            episode_rewards.append(reward)
+            nr_of_actions += 1
+        
+        all_episode_rewards.append(sum(episode_rewards))
+        all_nr_of_actions.append(nr_of_actions)
+    
+    mean_episode_reward = np.mean(all_episode_rewards)
+    print("Mean reward:", mean_episode_reward, "Num episodes:", num_episodes)
+
+    return mean_episode_reward, all_episode_rewards, all_nr_of_actions
