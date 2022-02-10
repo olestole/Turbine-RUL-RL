@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 
 from stable_baselines3 import DQN
+from stable_baselines3.common.monitor import load_results
 
 # Configuration
 figsize = (9, 3)
@@ -259,7 +260,9 @@ def save_dataframe(df, log_dir):
 def plot_train_reward(log_dir):
     env_monitor = load_results(log_dir)
     rewards = env_monitor['r']
+    plt.title('Train reward')
     plt.plot(rewards)
 
 def plot_test_reward(df):
+    plt.title('Test reward')
     plt.plot(df['reward'])
