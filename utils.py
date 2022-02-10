@@ -213,3 +213,42 @@ def evaluate(model, environment, num_episodes=100):
     print("Mean reward:", mean_episode_reward, "Num episodes:", num_episodes)
 
     return mean_episode_reward, all_episode_rewards, all_nr_of_actions
+
+def create_results_dataframe(machine_max_rul, all_episode_rewards, all_nr_of_actions, ):
+    # data_sv_test -> The dataframe with the test-data
+    # dt_in_test -> The columns to be used as input-data
+
+    # Create a dataframe with the results
+    d = {
+        'machine': np.arange(1, len(machine_max_rul) + 1),
+        'reward': np.array(all_episode_rewards),
+        'num_actions': np.array(all_nr_of_actions),
+        'max_RUL': np.array(machine_max_rul)
+    }
+
+    df = pd.DataFrame(data=d, index=None)
+    return df
+
+def get_crash_points(df):
+    return df[(df['max_RUL'] == df["num_actions"]) & (df['reward'] < 0)]
+
+def plot_slack(df, stop = 100, normalized = True):
+    crash_points = get_crash_points(df)
+    
+    df["slack"] = (df["max_RUL"] - df["num_actions"])
+    average_slack = df['slack'].mean()
+    
+    normalized_slack = df['slack']/df["max_RUL"]
+    normalized_average_slack = normalized_slack.mean()    
+
+    plt.title(f"Average slack: {round(average_slack, 2)}")
+    if normalized:
+        plt.plot(normalized_slack[:stop])
+        plt.hlines(normalized_average_slack, 0, stop, color='orange', linestyles='dashed')
+    else:
+        plt.plot(df["slack"][:stop])
+        plt.hlines(average_slack, 0, stop, color='orange', linestyles='dashed')
+        
+    plt.plot(crash_points['slack'][crash_points['slack'].index < stop], '.', color='red')
+    plt.legend(['Slack', 'Average slack', 'Crashed machine'])
+    plt.show()
