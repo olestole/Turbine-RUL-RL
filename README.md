@@ -4,6 +4,9 @@ The preprocessing and most of the utilities are taken from our professor's work,
 
 ## Installation
 
+Requirements:
+- python 3.9
+
 ```bash
 # Create a virtual env to manage the project's dependencies
 $ python -m venv venv
@@ -16,4 +19,3 @@ $ pip install -r requirements.txt
 $ tensorboard --logdir ./tensorboard/
 
 ```
-
