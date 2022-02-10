@@ -176,6 +176,7 @@ def save_model(model, path="./pretrained_models/model_1"):
     model.save(path)
 
 
-def load_model(env, path):
+def load_model(path, env=None):
+    # If the model is supposed to be trained on, env need to be set. If it's only going to be used for prediction, it can be None
     model = DQN.load(path, env=env)
     return model
