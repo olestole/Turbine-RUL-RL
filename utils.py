@@ -262,7 +262,19 @@ def plot_train_reward(log_dir):
     rewards = env_monitor['r']
     plt.title('Train reward')
     plt.plot(rewards)
+    plt.show()
 
 def plot_test_reward(df):
     plt.title('Test reward')
     plt.plot(df['reward'])
+    plt.show()
+
+def plot_crash_points_max_rul(df):
+    crash_points = get_crash_points(df)
+    max_rul_crash_points = crash_points.copy()['max_RUL'].reset_index().drop('index', axis=1)
+    avg_maxrul = max_rul_crash_points.mean()
+
+    plt.plot(max_rul_crash_points)
+    plt.hlines(avg_maxrul, 0, max_rul_crash_points.index.max(), color='orange', linestyles='dashed')
+    plt.title(f"Max RUL of the crashing machines\nAverage max RUL: {round(avg_maxrul.values[0], 2)}")
+    plt.show()
