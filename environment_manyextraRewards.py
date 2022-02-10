@@ -3,7 +3,7 @@ from gym.spaces import Discrete, Box
 import numpy as np
 import random
 
-class RULEnvironment(Env):
+class RULEnvironment_3(Env):
     def __init__(self, dataframe, dt_in, sweet_spot=0.3, bad_spot=0.3):
         self.dataframe = dataframe
         self.episode_nr = 0
