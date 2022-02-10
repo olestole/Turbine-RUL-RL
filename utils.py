@@ -255,3 +255,11 @@ def plot_slack(df, stop = 100, normalized = True):
 
 def save_dataframe(df, log_dir):
     df.to_csv(f'{log_dir}results.csv')
+
+def plot_train_reward(log_dir):
+    env_monitor = load_results(log_dir)
+    rewards = env_monitor['r']
+    plt.plot(rewards)
+
+def plot_test_reward(df):
+    plt.plot(df['reward'])
