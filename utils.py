@@ -146,33 +146,6 @@ def plot_rul(
     plt.tight_layout()
 
 
-class RULCostModel:
-    def __init__(self, maintenance_cost, safe_interval=0):
-        self.maintenance_cost = maintenance_cost
-        self.safe_interval = safe_interval
-
-    def cost(self, machine, pred, thr, return_margin=False):
-        # Merge machine and prediction data
-        tmp = np.array([machine, pred]).T
-        tmp = pd.DataFrame(data=tmp, columns=["machine", "pred"])
-        # Cost computation
-        cost = 0
-        nfails = 0
-        slack = 0
-        for mcn, gtmp in tmp.groupby("machine"):
-            idx = np.nonzero(gtmp["pred"].values < thr)[0]
-            if len(idx) == 0:
-                cost += self.maintenance_cost
-                nfails += 1
-            else:
-                cost -= max(0, idx[0] - self.safe_interval)
-                slack += len(gtmp) - idx[0]
-        if not return_margin:
-            return cost
-        else:
-            return cost, nfails, slack
-
-
 def save_model(model, path="./pretrained_models/model_1"):
     model.save(path)
 
@@ -266,6 +239,7 @@ def plot_slack(df, stop = 100, normalized = True):
     plt.plot(perfect_points['slack'][perfect_points['slack'].index < stop], '.', color='green')
     plt.legend(['Slack', 'Average slack', 'Crashed machine', 'Perfectly stoped machines'])
     plt.show()
+    return normalized_average_slack
 
 def save_dataframe(df, log_dir):
     df.to_csv(f'{log_dir}results.csv')
@@ -322,3 +296,4 @@ def environment_results(df):
     print('percent_of_perfect_machines:', percent_of_perfect_machines)
     stop_within_sweetspot = round(len(df[(df['slack'] < 20) & (df['reward_estimate'] > 0)])/df['machine'].max(), 4)
     print('stop_within_sweetspot:', stop_within_sweetspot)
+    return percent_of_crashed_machines, percent_of_perfect_machines, stop_within_sweetspot
