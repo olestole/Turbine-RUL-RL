@@ -242,23 +242,29 @@ def create_results_dataframe(machine_max_rul, all_episode_rewards, all_nr_of_act
 def get_crash_points(df):
     return df[(df['max_RUL'] == df["num_actions"]) & (df['reward'] < 0)]
 
+def get_perfect_points(df):
+    return df[(df['max_RUL'] == df["num_actions"]) & (df['reward'] > 0)]
+
 def plot_slack(df, stop = 100, normalized = True):
     average_slack = df['slack'].mean()
     
     crash_points = get_crash_points(df)
+    perfect_points = get_perfect_points(df)
     normalized_slack = df['slack']/df["max_RUL"]
     normalized_average_slack = normalized_slack.mean()    
 
-    plt.title(f"Average slack: {round(average_slack, 2)}")
     if normalized:
+        plt.title(f"Average slack: {round(normalized_average_slack, 2)}")
         plt.plot(normalized_slack[:stop])
         plt.hlines(normalized_average_slack, 0, stop, color='orange', linestyles='dashed')
     else:
+        plt.title(f"Average slack: {round(average_slack, 2)}")
         plt.plot(df["slack"][:stop])
         plt.hlines(average_slack, 0, stop, color='orange', linestyles='dashed')
         
     plt.plot(crash_points['slack'][crash_points['slack'].index < stop], '.', color='red')
-    plt.legend(['Slack', 'Average slack', 'Crashed machine'])
+    plt.plot(perfect_points['slack'][perfect_points['slack'].index < stop], '.', color='green')
+    plt.legend(['Slack', 'Average slack', 'Crashed machine', 'Perfectly stoped machines'])
     plt.show()
 
 def save_dataframe(df, log_dir):
@@ -286,24 +292,33 @@ def plot_crash_points_max_rul(df):
     plt.title(f"Max RUL of the crashing machines\nAverage max RUL: {round(avg_maxrul.values[0], 2)}")
     plt.show()
 
-def plot_average_reward(df, stop=100):
+def plot_average_reward(df, stop=100, extra_reward=None):
+    if extra_reward:
+        df['reward_estimate'] = round(df['reward'] / (df['max_RUL'] + extra_reward), 2)
     df.loc[df['reward_estimate'] < 0, 'reward_estimate'] = 0
     average_reward_estimate = df['reward_estimate'].mean()
     df["slack"] = (df["max_RUL"] - df["num_actions"])
     
     crash_points = get_crash_points(df)
+    perfect_points = get_perfect_points(df)
+
 
     plt.title(f"Average reward estimate: {round(average_reward_estimate, 2)}")
     plt.plot(df['reward_estimate'][:stop])
     plt.hlines(average_reward_estimate, 0, stop, color='orange', linestyles='dashed')
     plt.plot(crash_points['slack'][crash_points['slack'].index < stop], '.', color='red')
-    plt.legend(['Reward estimate', 'Average reward estimate', 'Crashed machine'])
+    plt.plot(perfect_points['reward_estimate'][perfect_points['reward_estimate'].index < stop], '.', color='green')
+
+    plt.legend(['Reward estimate', 'Average reward estimate', 'Crashed machine', 'Perfectly stoped machines'])
     plt.show()
 
 def environment_results(df):
     crash_points = get_crash_points(df)
+    perfect_points = get_perfect_points(df)
 
     percent_of_crashed_machines = round(len(crash_points['slack'])/df['machine'].max(), 4)
     print('percent_of_crashed_machines:', percent_of_crashed_machines)
+    percent_of_perfect_machines = round(len(perfect_points)/df['machine'].max(), 4)
+    print('percent_of_perfect_machines:', percent_of_perfect_machines)
     stop_within_sweetspot = round(len(df[(df['slack'] < 20) & (df['reward_estimate'] > 0)])/df['machine'].max(), 4)
     print('stop_within_sweetspot:', stop_within_sweetspot)
