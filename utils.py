@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 import pandas as pd
 import numpy as np
 
-from stable_baselines3 import DQN
+from stable_baselines3 import DQN, PPO
 from stable_baselines3.common.monitor import load_results
 
 # Configuration
@@ -177,9 +177,14 @@ def save_model(model, path="./pretrained_models/model_1"):
     model.save(path)
 
 
-def load_model(path, env=None):
+def load_model(path, env=None, model_type=1):
     # If the model is supposed to be trained on, env need to be set. If it's only going to be used for prediction, it can be None
-    model = DQN.load(path, env=env)
+    if model_type == 1:
+        model = DQN.load(path, env=env)
+    elif model_type == 2:
+        model = PPO.load(path, env=env)
+    else:
+        raise Exception("Not correct model type")
     return model
 
 def evaluate(model, environment, num_episodes=100):
