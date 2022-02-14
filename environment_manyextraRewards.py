@@ -3,8 +3,8 @@ from gym.spaces import Discrete, Box
 import numpy as np
 import random
 
-class RULEnvironment_1(Env):
-    def __init__(self, dataframe, dt_in):
+class RULEnvironment_3(Env):
+    def __init__(self, dataframe, dt_in, sweet_spot=0.3, bad_spot=0.3):
         self.dataframe = dataframe
         self.episode_nr = 0
         self.dt_in = dt_in
@@ -17,6 +17,11 @@ class RULEnvironment_1(Env):
         # self._set_variables()
 
         self.penalty = dataframe['rul'].max() * -1
+        # Sweetspot tells us that the last percentage is nice
+        self.sweet_spot = sweet_spot
+        # Badspot tells us that the first percentage is bad
+        self.bad_spot = bad_spot
+        
 
 
     def _set_variables(self):
@@ -29,7 +34,7 @@ class RULEnvironment_1(Env):
         self.index = 1
         self.state = np.array(self.episode[self.dt_in].loc[self.episode['cycle'] == self.index]).flatten()
         self.RUL = self.episode.loc[self.episode['cycle'] == self.index]['rul'].item() # acctual remaining useful life.
-
+        self.max_RUL = self.episode['rul'].max()
 
     def step(self, action):
         done = False
@@ -37,7 +42,12 @@ class RULEnvironment_1(Env):
 
         if action == 1:
             # Action is stop
-            reward = 1
+            if self.RUL < round(self.sweet_spot*self.max_RUL):
+                reward = 200
+            elif self.RUL > self.max_RUL - round(self.bad_spot*self.max_RUL):
+                reward = -200
+            else:
+                reward = 1
             done = True
         elif self.RUL <= 0 and action == 0:
             reward = self.penalty # Denne må bestemmes i forhold til hva som er max RUL, og hva han skrev i oppg
