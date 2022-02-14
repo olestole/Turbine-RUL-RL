@@ -6,10 +6,19 @@ The final version of this project leverages [Stable-Baselines3](https://stable-b
 
 ### Overview
 `turbine-rul-rl.ipynb`
-- Should be ran first in order to preprocess and create the data needed. The data is then experimented with in `plot_results.ipynb`.
+- Here the train and test data are loaded, preprocessed and linked to an environment. Further, the models are created, trained and tested with the defined environments. The trained models and test results are saved into the `pretrained_models` folder.
 
 `plot_results.ipynb`
-- Using the data created by `turbine-rul-rl.ipynb`. Discuss and experiment.
+-  This file displayes the test and train results for the trained and tested models saved by running `turbine-rul-rl.ipynb`.
+
+`enviroment1.py`
+- Defines the first tested environment. Gives +1 as reward for every timestep and gives a large penalty if the machine crashes.
+
+`enviroment2.py`
+- Defines the second tested environment, it only differs from the first environment in its rewards and penalties. This environment additionally includes +100 if the machine stops within a defined *sweetspot*.
+
+`enviroment3.py`
+- Defines the third tested environment, this also only differs from the other environments in its rewards and penalties. The envrionment includes both a defined *sweetspot* and a defined *badspot*. If the agent stops within the *badspot* it recieves -100 in penalty, if it stops within the *sweetspot* it receives a reward of +100.
 
 ### Disclaimer
 
